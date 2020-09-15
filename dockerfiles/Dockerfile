@@ -8,13 +8,17 @@ ARG GID
 
 # Install core linux tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-	apt-utils lsb-release sudo unzip wget ssh vim curl ca-certificates gnupg \
+	apt-utils lsb-release sudo unzip wget ssh vim curl ca-certificates gnupg git \
 	&& rm -rf /var/lib/apt/lists/* 
 
 # Install python
-RUN apt-get update && apt-get install -y python3-dev python3-opencv \ 
-	python3-pytest python3-pytest-mock python3-pytest-cov make python3-yaml --no-install-recommends \ 
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-opencv \ 
+	python3-pytest python3-pytest-mock python3-pytest-cov make python3-yaml python3-pip \
+	python3-setuptools --no-install-recommends \ 
 	&& rm -rf /var/lib/apt/lists/* 
+
+# Install dev dependencies
+RUN pip3 install coveralls
 
 # User and permissions
 ARG HOME=/home/${USER}
