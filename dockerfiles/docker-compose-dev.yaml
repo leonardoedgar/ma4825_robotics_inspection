@@ -9,7 +9,7 @@ services:
         GROUP: ${dGROUP}
         UID: ${dUID}
         GID: ${dGID}
-    image: leonardoedgar/ma4825-vision:master-latest
+    image: leonardoedgar/robotics-inspection:${VERSION}
     container_name: master
     network_mode: "host"
     environment:
