@@ -1,0 +1,25 @@
+version: '3.3'
+
+services:
+  master:
+    build:
+      context: .
+      args:
+        USER: ${dUSER}
+        GROUP: ${dGROUP}
+        UID: ${dUID}
+        GID: ${dGID}
+    image: leonardoedgar/ma4825-vision:master-latest
+    container_name: master
+    network_mode: "host"
+    environment:
+      - DISPLAY=unix$DISPLAY
+      - VIDEO_DEVICE_ID=${VIDEO_DEVICE_ID}
+    shm_size: 256M
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ../:/home/${dUSER}/
+    devices:
+      - /dev/video${VIDEO_DEVICE_ID}:/dev/video${VIDEO_DEVICE_ID}
+    stop_signal: SIGINT
+    command: sleep infinity
