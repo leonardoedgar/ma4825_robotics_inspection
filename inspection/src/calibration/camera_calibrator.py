@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import glob
 import os
-from inspection.exception import CalibrationException
+from exception.exception import CalibrationException
 import datetime
 import yaml
 

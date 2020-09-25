@@ -1,5 +1,7 @@
 # ma4825_robotics_inspection
-[![Coverage Status](https://coveralls.io/repos/github/leonardoedgar/ma4825_robotics_inspection/badge.svg?branch=master)](https://coveralls.io/github/leonardoedgar/ma4825_robotics_inspection?branch=master)
+![Actions Status](https://github.com/leonardoedgar/ma4825_robotics_inspection/workflows/Continuous%20Integration%20(CI)/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/leonardoedgar/ma4825_robotics_inspection/badge.svg?branch=master&service=github)](https://coveralls.io/github/leonardoedgar/ma4825_robotics_inspection?branch=master)
+
 
 NTU MA4825 Robotics Project AY20/21
 * Perform object classification to distinguish defected and non-defected objects 
@@ -39,4 +41,4 @@ docker-compose -f docker-compose-dev.yaml build
 * Object classification
     * With resolution: 1280px by 960px
     	* FOVx (Horizontal Field of View) = ...°
-    	* FOVy (Vertical Field of View) = ...°
+    	* FOVy (Vertical Field of View) = ...°[

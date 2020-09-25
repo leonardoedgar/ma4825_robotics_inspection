@@ -52,4 +52,7 @@ jobs:
         run: |
           cd dockerfiles
           declare PARENT_DIR="$(dirname `pwd`)"
-          docker run --network=host --shm-size="256M" -e COVERALLS_REPO_TOKEN="${{ secrets.COVERALLS_REPO_TOKEN }}" -v ${PARENT_DIR}/:/home/${dUSER} --stop-signal=SIGINT leonardoedgar/robotics-inspection:master-${VERSION} /bin/bash -c "make unit_tests && coveralls"
+          docker run --network=host --shm-size="256M" -e COVERALLS_REPO_TOKEN="${{ secrets.COVERALLS_REPO_TOKEN }}" \
+            -v ${PARENT_DIR}/:/home/${dUSER}/ --stop-signal=SIGINT -w=/home/${dUSER}/inspection \
+            leonardoedgar/robotics-inspection:master-${VERSION} \
+            /bin/bash -c "python3 setup.py develop --user && make unit_tests && coveralls"

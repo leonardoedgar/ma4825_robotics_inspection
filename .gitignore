@@ -1,1 +1,9 @@
 *.pyc
+.bash_history
+.coverage
+.python_history
+.viminfo
+coverage.xml
+.idea
+.cache
+.local
