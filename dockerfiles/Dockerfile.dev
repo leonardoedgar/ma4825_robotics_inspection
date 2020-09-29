@@ -6,6 +6,10 @@ ARG GROUP
 ARG UID
 ARG GID
 
+# Set timezone
+ENV TZ=Asia/Singapore
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Install core linux tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	apt-utils lsb-release sudo unzip wget ssh vim curl ca-certificates gnupg git \

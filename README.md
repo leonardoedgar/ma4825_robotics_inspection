@@ -40,5 +40,5 @@ docker-compose -f docker-compose-dev.yaml build
 
 * Object classification
     * With resolution: 1280px by 960px
-    	* FOVx (Horizontal Field of View) = ...°
-    	* FOVy (Vertical Field of View) = ...°[
+    	* FOVx (Horizontal Field of View) = 49.81°
+    	* FOVy (Vertical Field of View) = 38.22°
