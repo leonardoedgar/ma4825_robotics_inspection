@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import numpy as np
 import cv2
 import glob
@@ -8,7 +9,17 @@ import yaml
 
 
 class CameraCalibrator(object):
+    """
+    A class to represent the camera calibrator.
+    """
     def __init__(self, original_images_path, undistorted_image_path, camera_params_path):
+        # type: (str, str, str) -> None
+        """Initialise the class.
+        Args:
+            original_images_path: path to original images taken by the uncalibrated camera
+            undistorted_image_path: path to save undistorted images of the calibrated camera
+            camera_params_path: path to export the calibrated camera params
+        """
         self.__undistorted_image_path = undistorted_image_path
         self.__original_image_filenames = glob.glob(os.path.join(original_images_path, "*.jpg"))
         self.__camera_params_path = camera_params_path
@@ -16,6 +27,8 @@ class CameraCalibrator(object):
         self.__annotated_original_images = []
 
     def calibrate(self):
+        # type: () -> None
+        """A function to calibrate the camera."""
         # termination criteria
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -34,7 +47,8 @@ class CameraCalibrator(object):
         height, width = cv2.imread(self.__original_image_filenames[0], 0).shape[:2]
 
         for image_filename in self.__original_image_filenames:
-            gray_img = cv2.imread(image_filename, 0)
+            img_color = cv2.imread(image_filename)
+            gray_img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
 
             # Find the chess board corners
             ret, corners = cv2.findChessboardCorners(gray_img, (cbcol, cbrow), None)
@@ -47,15 +61,13 @@ class CameraCalibrator(object):
             img_points.append(corners2)
 
             # Draw and display the corners
-            img = cv2.drawChessboardCorners(gray_img, (cbcol, cbrow), corners2, ret)
+            img = cv2.drawChessboardCorners(img_color, (cbcol, cbrow), corners2, ret)
             self.__annotated_original_images.append(img)
 
         rms_error, mtx, dist_coe, rvecs, tvecs = cv2.calibrateCamera(obj_points, img_points,
                                                                      (width, height),
                                                                      None, None)
         new_camera_mtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist_coe, (width, height), 1, (width, height))
-        new_camera_mtx = np.hstack((new_camera_mtx, np.zeros((3, 1))))
-
         self.__camera_params["resolution"] = {"width": width, "height": height}
         self.__camera_params["camera_mtx"] = mtx
         self.__camera_params["dist_coef"] = dist_coe
@@ -63,6 +75,8 @@ class CameraCalibrator(object):
         self.__camera_params["rms_error"] = rms_error
 
     def save_undistorted_images(self):
+        # type: () -> None
+        """A function to save undistorted images with a calibrated camera."""
         if not self.__annotated_original_images:
             raise CalibrationException("Unable to find annotated calibration images. Ensure to "
                                        "calibrate using images before calling this method.")
@@ -80,10 +94,18 @@ class CameraCalibrator(object):
                         undistorted_image)
 
     def export_camera_params(self):
+        # type: () -> None
+        """A function to export calibrated camera params to a yaml file."""
         if not self.__camera_params:
             raise CalibrationException("Unable to find calibrated camera params. Camera is uncalibrated.")
         timestamp = (datetime.datetime.now()).strftime("%m/%d/%Y/%H:%M:%S")
         output_filename = os.path.join(self.__camera_params_path, (timestamp + ".yaml").replace("/", "-"))
+        if not os.path.exists(self.__camera_params_path):
+            os.makedirs(self.__camera_params_path)
+        camera_params = self.__camera_params.copy()
+        camera_params["camera_mtx"] = camera_params["camera_mtx"].tolist()
+        camera_params["dist_coef"] = camera_params["dist_coef"].tolist()
+        camera_params["new_camera_mtx"] = camera_params["new_camera_mtx"].tolist()
         with open(output_filename, 'w') as file:
-            yaml.dump(self.__camera_params, file, default_flow_style=None)
+            yaml.dump(camera_params, file, default_flow_style=None)
         print("output filename: %s" % output_filename)
