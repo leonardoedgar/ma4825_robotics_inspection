@@ -10,10 +10,10 @@ Owner: Leonardo Edgar (leonardo_edgar98@outlook.com)
 
 ## Table of Contents
 
-   1. [Getting started](#markdown-header-1-getting-started)
-   2. [Prerequisites](#markdown-header-2-prerequisites)
-   3. [Installing](#markdown-header-3-installing)
-   4. [System characteristics](#markdown-header-4-system-characteristics)
+   1. [Getting started](#1-getting-started)
+   2. [Prerequisites](#2-prerequisites)
+   3. [Installing](#3-installing)
+   4. [System characteristics](#4-system-characteristics)
 
 
 ## 1. Getting started
