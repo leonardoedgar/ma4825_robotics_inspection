@@ -42,4 +42,4 @@ class SerialDevice(object):
         Args:
             resp: response data to send
         """
-        self.__serial_device.write(str.encode(str(resp)))
+        self.__serial_device.write(bytes([resp]))

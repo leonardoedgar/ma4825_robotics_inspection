@@ -41,4 +41,4 @@ def test_send_response(mocker):
     mocked_serial, serial_device = get_mocked_serial_device(mocker, SERIAL_PORT, BAUD_RATE)
     test_int = 1
     serial_device.send_response(test_int)
-    assert mocked_serial().write.call_args[0][0] == str.encode(str(test_int))
+    assert mocked_serial().write.call_args[0][0] == bytes([test_int])
