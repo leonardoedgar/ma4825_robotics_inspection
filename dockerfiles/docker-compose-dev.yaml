@@ -17,11 +17,13 @@ services:
     environment:
       - DISPLAY=unix$DISPLAY
       - VIDEO_DEVICE_ID=${VIDEO_DEVICE_ID}
+      - SERIAL_DEVICE_PORT=${SERIAL_DEVICE_PORT}
     shm_size: 256M
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ../inspection:/home/${dUSER}/inspection
     devices:
+      - ${SERIAL_DEVICE_PORT}:${SERIAL_DEVICE_PORT}
       - /dev/video${VIDEO_DEVICE_ID}:/dev/video${VIDEO_DEVICE_ID}
     stop_signal: SIGINT
     command: sleep infinity
