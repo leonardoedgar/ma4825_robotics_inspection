@@ -1,38 +1,48 @@
 #!/usr/bin/python3
 from hardware.uvc_driver import UVCDriver
+from vision.defect_detector import DefectDetector
 from exception.exception import HardwareException
+from pathlib import Path
 import cv2
 import os
 import threading
 import time
+import yaml
+import calibration
 
 
-def post_process_image():
-	while True:
-		try:
-			image = uvc_driver.capture_image()
-			gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-			ret, thresh = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-			# contours, hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-			cv2.imshow('gray', thresh)
-			if cv2.waitKey(1) & 0xFF == ord('q'):
-				break
-		except HardwareException as err:
-			print("Err: %s" % err)
-			time.sleep(0.5)
-		except KeyboardInterrupt:
-			break
+def detect_defect():
+    """A function to detect defect from an image taken by a camera."""
+    while True:
+        try:
+            image = uvc_driver.capture_image()
+            if detector.is_object_defected(image=uvc_driver.capture_image(), show_window=True):
+                print("DEFECT")
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        except HardwareException as err:
+            print("Err: %s" % err)
+            time.sleep(0.5)
+        except KeyboardInterrupt:
+            break
 
 
 if __name__ == '__main__':
-	uvc_driver = UVCDriver(
-		video_device_id=int(os.getenv("VIDEO_DEVICE_ID")),
-		frame_res=(1280, 960))
-	uvc_thread = threading.Thread(target=uvc_driver.start)
-	image_processor_thread = threading.Thread(target=post_process_image)
-	uvc_thread.start()
-	image_processor_thread.start()
-	uvc_thread.join()
-	image_processor_thread.join()
-	uvc_driver.release()
-	time.sleep(1)
+    camera_config_path = os.path.join(Path(calibration.__file__).parent, "config", "intrinsic",
+                                      "camera_info.yaml")
+    with open(camera_config_path) as camera_config_file:
+        camera_config = yaml.load(stream=camera_config_file)
+        with open(camera_config["config"]["intrinsic"]) as camera_params_file:
+            camera_params = yaml.load(stream=camera_params_file)
+    uvc_driver = UVCDriver(
+        video_device_id=int(os.getenv("VIDEO_DEVICE_ID")),
+        frame_res=(1280, 960))
+    detector = DefectDetector()
+    uvc_thread = threading.Thread(target=uvc_driver.start)
+    image_processor_thread = threading.Thread(target=detect_defect)
+    uvc_thread.start()
+    image_processor_thread.start()
+    uvc_thread.join()
+    image_processor_thread.join()
+    uvc_driver.release()
+    time.sleep(1)

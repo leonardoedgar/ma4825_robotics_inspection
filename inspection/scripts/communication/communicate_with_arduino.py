@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from communication.serial_device import SerialDevice
 import os
 
