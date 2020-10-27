@@ -21,9 +21,11 @@ def get_mocked_camera_calibrator(mocker):
                                [0.0, 1385.3125, 502.5054, 0.0],
                                [0.0, 0.0, 1.0, 0.0]])
     rms_error = 0.411
+    roi = {"height": 949, "width": 1276, "x": 2, "y": 5}
     camera_params = {"resolution": {"width": image_dim[0], "height": image_dim[1]},
                      "camera_mtx": camera_mtx, "new_camera_mtx": new_camera_mtx,
-                     "dist_coef": dist_coef, "rms_error": rms_error}
+                     "dist_coef": dist_coef, "rms_error": rms_error,
+                     "roi": roi}
     original_images_path = os.path.join(home, "original_images")
     mocker.patch("glob.glob", return_value=[os.path.join(original_images_path, TEST_IMAGE_FILENAME)])
     undistorted_images_path = os.path.join(home, "undistorted_images")
@@ -38,7 +40,8 @@ def get_mocked_camera_calibrator(mocker):
     mocker.patch("cv2.cornerSubPix")
     mocker.patch("cv2.drawChessboardCorners")
     mocker.patch("cv2.calibrateCamera", return_value=[rms_error, camera_mtx, dist_coef, None, None])
-    mocker.patch("cv2.getOptimalNewCameraMatrix", return_value=[new_camera_mtx, None])
+    mocker.patch("cv2.getOptimalNewCameraMatrix",
+                 return_value=[new_camera_mtx, (roi["x"], roi["y"], roi["width"], roi["height"])])
     camera_calibrator.calibrate()
     return camera_calibrator, camera_params
 

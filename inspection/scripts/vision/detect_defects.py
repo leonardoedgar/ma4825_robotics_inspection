@@ -15,9 +15,7 @@ def detect_defect():
     """A function to detect defect from an image taken by a camera."""
     while True:
         try:
-            image = uvc_driver.capture_image()
-            if detector.is_object_defected(image=uvc_driver.capture_image(), show_window=True):
-                print("DEFECT")
+            detector.is_object_defected(image=uvc_driver.capture_image(), show_window=True)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         except HardwareException as err:
@@ -37,7 +35,7 @@ if __name__ == '__main__':
     uvc_driver = UVCDriver(
         video_device_id=int(os.getenv("VIDEO_DEVICE_ID")),
         frame_res=(1280, 960))
-    detector = DefectDetector()
+    detector = DefectDetector(camera_params=camera_params)
     uvc_thread = threading.Thread(target=uvc_driver.start)
     image_processor_thread = threading.Thread(target=detect_defect)
     uvc_thread.start()

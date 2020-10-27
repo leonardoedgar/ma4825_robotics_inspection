@@ -73,6 +73,7 @@ class CameraCalibrator(object):
         self.__camera_params["dist_coef"] = dist_coe
         self.__camera_params["new_camera_mtx"] = new_camera_mtx
         self.__camera_params["rms_error"] = rms_error
+        self.__camera_params["roi"] = {"x": roi[0], "y": roi[1], "width": roi[2], "height": roi[3]}
 
     def save_undistorted_images(self):
         # type: () -> None
