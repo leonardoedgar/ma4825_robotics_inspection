@@ -1,0 +1,30 @@
+version: '3.3'
+
+services:
+  master:
+    build:
+      context: ..
+      dockerfile: dockerfiles/Dockerfile.dev
+      args:
+        USER: ${dUSER}
+        GROUP: ${dGROUP}
+        UID: ${dUID}
+        GID: ${dGID}
+        VERSION: ${VERSION}
+    image: leonardoedgar/robotics-inspection:master-${VERSION}
+    container_name: master
+    network_mode: "host"
+    environment:
+      - DISPLAY=unix$DISPLAY
+      - VIDEO_DEVICE_ID=${VIDEO_DEVICE_ID}
+      - SERIAL_DEVICE_PORT=${SERIAL_DEVICE_PORT}
+    shm_size: 256M
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ../inspection:/home/${dUSER}/inspection
+    devices:
+      - ${SERIAL_DEVICE_PORT}:${SERIAL_DEVICE_PORT}
+      - /dev/video${VIDEO_DEVICE_ID}:/dev/video${VIDEO_DEVICE_ID}
+    stop_signal: SIGINT
+    command: python3 start_vision_server.py
+    working_dir: /home/${dUSER}/inspection/scripts/app
