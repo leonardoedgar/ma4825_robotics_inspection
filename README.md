@@ -1,7 +1,6 @@
 # ma4825_robotics_inspection
 ![Actions Status](https://github.com/leonardoedgar/ma4825_robotics_inspection/workflows/Continuous%20Integration%20(CI)/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/leonardoedgar/ma4825_robotics_inspection/badge.svg?branch=master&service=github)](https://coveralls.io/github/leonardoedgar/ma4825_robotics_inspection?branch=master)
-
+[![Coverage Status](https://coveralls.io/repos/github/leonardoedgar/ma4825_robotics_inspection/badge.svg?branch=master)](https://coveralls.io/github/leonardoedgar/ma4825_robotics_inspection?branch=master)
 
 NTU MA4825 Robotics Project AY20/21
 * Perform object classification to distinguish defected and non-defected objects 
