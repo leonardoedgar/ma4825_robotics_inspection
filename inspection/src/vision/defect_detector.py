@@ -29,55 +29,57 @@ class DefectDetector(object):
                       self.__camera_params["roi"]["y"] + self.__camera_params["roi"]["height"],
                       self.__camera_params["roi"]["x"]:
                       self.__camera_params["roi"]["x"] + self.__camera_params["roi"]["width"]]
-        original_image = image.copy()
+
+        # Crop image based on region of interest
+        height, width = image.shape[:2]
+        roi = image[int(height / 3):int(height * 4 / 5),
+                    int(width / 4):int(width * 3 / 4), :]
+        original_roi = roi.copy()
 
         # Threshold image
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         thresh = cv2.threshold(cv2.bitwise_not(gray), 200, 255, cv2.THRESH_TOZERO)[1]
 
         # Find all contours
         contours = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
-        min_area = math.pow(10, 5) * 0.4
+        min_area = math.pow(10, 5) * 0.2
         max_area = math.pow(10, 5) * 1
+        image[:, :, 2] = 0
 
         # Filter found contours based on area
         for c in contours:
             area = cv2.contourArea(c)
             if min_area < area < max_area:
-                cv2.drawContours(image, [c], -1, (0, 0, 255), -1)
-        copied_result = image.copy()
+                cv2.drawContours(roi, [c], -1, (0, 0, 255), -1)
+        copied_result = roi.copy()
         mask = np.array(copied_result[:, :, 2])
         mask = cv2.threshold(mask, 254, 255, cv2.THRESH_BINARY)[1]
-        segmented_object = cv2.bitwise_and(original_image, original_image, mask=mask)
+        segmented_object = cv2.bitwise_and(original_roi, original_roi, mask=mask)
 
-        # Crop image based on region of interest
-        height, width = segmented_object.shape[:2]
-        roi = segmented_object[
-              int(height / 4):int(height * 3 / 4), int(width / 4):int(width * 3 / 4), :]
-
-        roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        roi_thresh = cv2.threshold(roi_gray, 55, 255, cv2.THRESH_BINARY)[1]
+        # Threshold segmented object
+        gray_segmented = cv2.cvtColor(segmented_object, cv2.COLOR_BGR2GRAY)
+        gray_segmented = cv2.threshold(gray_segmented, 70, 255, cv2.THRESH_BINARY)[1]
 
         # Noise removal
         kernel = np.ones((3, 3), np.uint8)
-        roi_thresh = cv2.erode(src=roi_thresh, kernel=kernel, iterations=1)
+        gray_segmented = cv2.erode(src=gray_segmented, kernel=kernel, iterations=1)
 
         # Label results
         is_defected = False
-        if (roi_thresh > 254).any():
+        if (gray_segmented > 254).any():
             is_defected = True
-            cv2.putText(original_image, "DEFECT",
+            cv2.putText(original_roi, "DEFECT",
                         (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
                         (0, 0, 255), 2)
         else:
-            cv2.putText(original_image, "NO DEFECT",
+            cv2.putText(original_roi, "NO DEFECT",
                         (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
                         (0, 0, 255), 2)
 
         # Display results
         if show_window:
-            cv2.imshow("segmentation", image)
             cv2.imshow("roi", roi)
-            cv2.imshow("defect", roi_thresh)
-            cv2.imshow("result", original_image)
+            cv2.imshow("segmentation", segmented_object)
+            cv2.imshow("defect", gray_segmented)
+            cv2.imshow("labelled", original_roi)
         return is_defected
